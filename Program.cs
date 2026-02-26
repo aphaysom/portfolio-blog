@@ -1,7 +1,9 @@
 using FastEndpoints;
 using FluentValidation;
 using Mediator;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 using PortainerBlog.Data;
 using PortainerBlog.Infrastructure.Behaviors;
 using PortainerBlog.Repositories;
@@ -13,6 +15,42 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddFastEndpoints();
+
+// Milestone 6.1: Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter(
+        "fixed",
+        opt =>
+        {
+            opt.PermitLimit = 10;
+            opt.Window = TimeSpan.FromSeconds(10);
+            opt.QueueLimit = 2;
+            opt.QueueProcessingOrder = System
+                .Threading
+                .RateLimiting
+                .QueueProcessingOrder
+                .OldestFirst;
+        }
+    );
+});
+
+// Milestone 6.2: Resilience (Polly)
+builder.Services.AddResiliencePipeline(
+    "db-pipeline",
+    pipeline =>
+    {
+        pipeline.AddRetry(
+            new Polly.Retry.RetryStrategyOptions
+            {
+                MaxRetryAttempts = 3,
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+                Delay = TimeSpan.FromSeconds(1),
+            }
+        );
+    }
+);
 
 builder.Services.AddMediator(options =>
 {
@@ -41,6 +79,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseRateLimiter();
 app.UseAuthorization();
 
 app.MapStaticAssets();

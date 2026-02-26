@@ -12,6 +12,7 @@ public class GetAllPostsEndpoint(IMediator mediator)
     {
         Get("/api/posts");
         AllowAnonymous();
+        Options(x => x.RequireRateLimiting("fixed"));
     }
 
     public override async Task HandleAsync(CancellationToken ct)
