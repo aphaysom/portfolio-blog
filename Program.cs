@@ -64,6 +64,17 @@ builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddDbContext<BlogDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+// Milestone 7: Caching (Redis + HybridCache)
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+});
+
+#pragma warning disable EXTEXP0018 // Type is for evaluation purposes only and is subject to change or removal in future updates.
+builder.Services.AddHybridCache();
+#pragma warning restore EXTEXP0018
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
