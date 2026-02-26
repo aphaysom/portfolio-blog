@@ -11,6 +11,8 @@ public class CreatePostEndpoint(IMediator mediator) : Endpoint<CreatePostRequest
     {
         Post("/api/posts");
         AllowAnonymous();
+        Description(b => b.Produces<PostResponse>(201));
+        Options(x => x.RequireRateLimiting("fixed"));
     }
 
     public override async Task HandleAsync(CreatePostRequest req, CancellationToken ct)
