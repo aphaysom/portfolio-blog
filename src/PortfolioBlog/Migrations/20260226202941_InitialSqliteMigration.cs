@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PortfolioBlog.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialPostgresMigration : Migration
+    public partial class InitialSqliteMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,21 +15,10 @@ namespace PortfolioBlog.Migrations
                 name: "Posts",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(
-                        type: "character varying(30)",
-                        maxLength: 30,
-                        nullable: false
-                    ),
-                    Content = table.Column<string>(
-                        type: "character varying(150)",
-                        maxLength: 150,
-                        nullable: false
-                    ),
-                    CreatedAt = table.Column<DateTime>(
-                        type: "timestamp with time zone",
-                        nullable: false
-                    ),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
+                    Content = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                 },
                 constraints: table =>
                 {

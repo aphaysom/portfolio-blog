@@ -2,6 +2,27 @@
 
 A modern ASP.NET Core blog application showcasing a progressive architectural modernization — from a simple Razor Pages CRUD to an enterprise-grade, API-first platform.
 
+## Quick Start
+
+```bash
+# Clone & run
+git clone https://github.com/aphaysom/portfolio-blog.git
+cd portfolio-blog
+
+# API (creates SQLite database automatically)
+cd src/PortfolioBlog && dotnet run
+
+# Client (in another terminal)
+cd src/PortfolioBlog.Web && dotnet run
+```
+
+- API: `http://localhost:5196` (Scalar docs at `/scalar`)
+- Client: `http://localhost:5156/posts`
+
+> **Note:** The project uses **SQLite** locally — no database setup required.
+> The Git history demonstrates a PostgreSQL migration path, but the `develop` branch
+> is configured with SQLite for zero-friction testing.
+
 ## Architecture
 
 ```
@@ -19,7 +40,7 @@ PortfolioBlog/
 | API Framework | FastEndpoints (Vertical Slice) |
 | CQRS | Mediator (Source Generator) |
 | Validation | FluentValidation |
-| Database | PostgreSQL + EF Core |
+| Database | SQLite (local) / PostgreSQL (production) |
 | Caching | HybridCache (L1 In-Memory + L2 Redis Cloud) |
 | Resilience | Polly v8 + Rate Limiting |
 | Auth | JWT Bearer + Role-based |
@@ -40,19 +61,6 @@ The Git history is structured as a progressive modernization, each milestone mer
 7. **Redis Caching** — HybridCache with Redis Cloud (L1+L2)
 8. **JWT Authentication** — Bearer tokens, role-based write protection
 9. **Blazor Client + Refit** — Separate Blazor Server app consuming the API via typed HTTP client with auto-auth `DelegatingHandler`
-
-## Running Locally
-
-```bash
-# API
-cd src/PortfolioBlog && dotnet run
-
-# Client (in another terminal)
-cd src/PortfolioBlog.Web && dotnet run
-```
-
-- API: `http://localhost:5196`
-- Client: `http://localhost:5156/posts`
 
 ## Key Patterns Demonstrated
 
