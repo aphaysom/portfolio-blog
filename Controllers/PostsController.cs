@@ -1,51 +1,38 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PortainerBlog.Data;
 using PortainerBlog.DTOs;
-using PortainerBlog.Models;
+using PortainerBlog.Services;
 
 namespace PortainerBlog.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PostsController(BlogDbContext context) : ControllerBase
+public class PostsController(IPostService postService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PostResponse>>> GetPosts()
     {
-        var posts = await context
-            .Posts.OrderByDescending(p => p.CreatedAt)
-            .Select(p => new PostResponse(p.Id, p.Title, p.Content, p.CreatedAt))
-            .ToListAsync();
-
+        var posts = await postService.GetPostsAsync();
         return Ok(posts);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<PostResponse>> GetPost(Guid id)
     {
-        var post = await context.Posts.FindAsync(id);
+        var post = await postService.GetPostAsync(id);
 
         if (post == null)
         {
             return NotFound();
         }
 
-        return Ok(new PostResponse(post.Id, post.Title, post.Content, post.CreatedAt));
+        return Ok(post);
     }
 
     [HttpPost]
     public async Task<ActionResult<PostResponse>> CreatePost(CreatePostRequest request)
     {
-        var post = new Post { Title = request.Title, Content = request.Content };
+        var post = await postService.CreatePostAsync(request);
 
-        context.Posts.Add(post);
-        await context.SaveChangesAsync();
-
-        return CreatedAtAction(
-            nameof(GetPost),
-            new { id = post.Id },
-            new PostResponse(post.Id, post.Title, post.Content, post.CreatedAt)
-        );
+        return CreatedAtAction(nameof(GetPost), new { id = post.Id }, post);
     }
 }

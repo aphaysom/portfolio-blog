@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using PortainerBlog.Data;
 using PortainerBlog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
