@@ -8,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddControllers();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddDbContext<BlogDbContext>(options =>
@@ -34,7 +33,36 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();
-app.MapControllers();
+
+// Milestone 3: Minimal API Evolution
+RouteGroupBuilder postsApi = app.MapGroup("/api/minimal/posts");
+
+postsApi.MapPost(
+    "/",
+    async (CreatePostRequest request, IPostService postService) =>
+    {
+        PostResponse post = await postService.CreatePostAsync(request);
+        return Results.Created($"/api/minimal/posts/{post.Id}", post);
+    }
+);
+
+postsApi.MapGet(
+    "/",
+    async (IPostService postService) =>
+    {
+        IEnumerable<PostResponse> posts = await postService.GetPostsAsync();
+        return Results.Ok(posts);
+    }
+);
+
+postsApi.MapGet(
+    "/{id}",
+    async (Guid id, IPostService postService) =>
+    {
+        PostResponse? post = await postService.GetPostAsync(id);
+        return post is not null ? Results.Ok(post) : Results.NotFound();
+    }
+);
 
 if (app.Environment.IsDevelopment())
 {
