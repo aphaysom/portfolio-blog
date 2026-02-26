@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PortainerBlog.Data;
 
 #nullable disable
@@ -12,37 +11,33 @@ using PortainerBlog.Data;
 namespace PortfolioBlog.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    [Migration("20260226094952_InitialPostgresMigration")]
-    partial class InitialPostgresMigration
+    [Migration("20260226202941_InitialSqliteMigration")]
+    partial class InitialSqliteMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
 
             modelBuilder.Entity("PortainerBlog.Models.Post", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 

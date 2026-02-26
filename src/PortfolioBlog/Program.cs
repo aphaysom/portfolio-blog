@@ -87,7 +87,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddDbContext<BlogDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // Milestone 7: Caching (Redis + HybridCache)
