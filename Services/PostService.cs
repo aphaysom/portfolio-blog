@@ -1,23 +1,20 @@
-using Microsoft.EntityFrameworkCore;
-using PortainerBlog.Data;
 using PortainerBlog.DTOs;
 using PortainerBlog.Models;
+using PortainerBlog.Repositories;
 
 namespace PortainerBlog.Services;
 
-public class PostService(BlogDbContext context) : IPostService
+public class PostService(IPostRepository repository) : IPostService
 {
     public async Task<IEnumerable<PostResponse>> GetPostsAsync()
     {
-        return await context
-            .Posts.OrderByDescending(p => p.CreatedAt)
-            .Select(p => new PostResponse(p.Id, p.Title, p.Content, p.CreatedAt))
-            .ToListAsync();
+        IEnumerable<Post> posts = await repository.GetAllAsync();
+        return posts.Select(p => new PostResponse(p.Id, p.Title, p.Content, p.CreatedAt));
     }
 
     public async Task<PostResponse?> GetPostAsync(Guid id)
     {
-        var post = await context.Posts.FindAsync(id);
+        Post? post = await repository.GetByIdAsync(id);
 
         if (post is null)
             return null;
@@ -27,10 +24,10 @@ public class PostService(BlogDbContext context) : IPostService
 
     public async Task<PostResponse> CreatePostAsync(CreatePostRequest request)
     {
-        var post = new Post { Title = request.Title, Content = request.Content };
+        Post post = new() { Title = request.Title, Content = request.Content };
 
-        context.Posts.Add(post);
-        await context.SaveChangesAsync();
+        await repository.AddAsync(post);
+        await repository.SaveChangesAsync();
 
         return new PostResponse(post.Id, post.Title, post.Content, post.CreatedAt);
     }

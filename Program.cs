@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using PortainerBlog.Data;
 using PortainerBlog.Repositories;
 using PortainerBlog.Services;
 
