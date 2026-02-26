@@ -19,7 +19,7 @@ public class PostService(BlogDbContext context) : IPostService
     {
         var post = await context.Posts.FindAsync(id);
 
-        if (post == null)
+        if (post is null)
             return null;
 
         return new PostResponse(post.Id, post.Title, post.Content, post.CreatedAt);
