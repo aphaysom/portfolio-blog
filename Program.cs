@@ -1,10 +1,14 @@
+using System.Text;
 using FastEndpoints;
 using FluentValidation;
 using Mediator;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Polly;
 using PortainerBlog.Data;
+using PortainerBlog.Infrastructure.Auth;
 using PortainerBlog.Infrastructure.Behaviors;
 using PortainerBlog.Repositories;
 using PortainerBlog.Services;
@@ -15,6 +19,27 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddFastEndpoints();
+
+// Milestone 8: JWT Authentication
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+            ),
+        };
+    });
+builder.Services.AddAuthorization();
 
 // Milestone 6.1: Rate Limiting
 builder.Services.AddRateLimiter(options =>

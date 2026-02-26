@@ -10,9 +10,9 @@ public class CreatePostEndpoint(IMediator mediator) : Endpoint<CreatePostRequest
     public override void Configure()
     {
         Post("/api/posts");
-        AllowAnonymous();
+        Roles("Admin");
         Description(b => b.Produces<PostResponse>(201));
-        Options(x => x.RequireRateLimiting("fixed"));
+        Options(x => x.RequireRateLimiting("fixed")); // Corrected from x.Requirapp.UseRateLimiter();
     }
 
     public override async Task HandleAsync(CreatePostRequest req, CancellationToken ct)
