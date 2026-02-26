@@ -1,11 +1,11 @@
-using Microsoft.EntityFrameworkCore;
-using PortainerBlog.Data;
+using PortainerBlog.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
+builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddDbContext<BlogDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
