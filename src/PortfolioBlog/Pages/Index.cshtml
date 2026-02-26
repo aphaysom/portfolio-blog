@@ -1,0 +1,43 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col d-flex justify-content-between align-items-center">
+            <h1>Blog Posts</h1>
+            <a asp-page="/Posts/Create" class="btn btn-primary">New Post</a>
+        </div>
+    </div>
+
+    <div class="row">
+        @if (!Model.Posts.Any())
+        {
+            <div class="col text-center py-5">
+                <p class="text-muted">No posts found. Be the first to write one!</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var post in Model.Posts)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">@post.Title</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@post.CreatedAt.ToLocalTime().ToString("f")</h6>
+                            <p class="card-text">
+                                @(post.Content.Length > 200 ? post.Content.Substring(0, 200) + "..." : post.Content)
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">ID: @post.Id.ToString()</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
