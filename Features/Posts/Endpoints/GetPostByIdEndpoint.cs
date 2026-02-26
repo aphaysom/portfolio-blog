@@ -1,10 +1,11 @@
 using FastEndpoints;
+using Mediator;
 using PortainerBlog.DTOs;
-using PortainerBlog.Services;
+using PortainerBlog.Features.Posts.Queries;
 
 namespace PortainerBlog.Features.Posts.Endpoints;
 
-public class GetPostByIdEndpoint(IPostService postService) : EndpointWithoutRequest<PostResponse>
+public class GetPostByIdEndpoint(IMediator mediator) : EndpointWithoutRequest<PostResponse>
 {
     public override void Configure()
     {
@@ -15,7 +16,8 @@ public class GetPostByIdEndpoint(IPostService postService) : EndpointWithoutRequ
     public override async Task HandleAsync(CancellationToken ct)
     {
         Guid id = Route<Guid>("id");
-        PostResponse? post = await postService.GetPostAsync(id);
+        IEnumerable<PostResponse> posts = await mediator.Send(new GetPostsQuery(), ct);
+        PostResponse? post = posts.FirstOrDefault(p => p.Id == id);
 
         if (post is null)
         {

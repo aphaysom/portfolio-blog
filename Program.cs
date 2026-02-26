@@ -1,6 +1,9 @@
 using FastEndpoints;
+using FluentValidation;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using PortainerBlog.Data;
+using PortainerBlog.Infrastructure.Behaviors;
 using PortainerBlog.Repositories;
 using PortainerBlog.Services;
 using Scalar.AspNetCore;
@@ -10,6 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddFastEndpoints();
+
+builder.Services.AddMediator(options =>
+{
+    options.ServiceLifetime = ServiceLifetime.Scoped;
+});
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddDbContext<BlogDbContext>(options =>
