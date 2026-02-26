@@ -1,0 +1,90 @@
+@page "/posts"
+@using PortfolioBlog.Web.Models
+@using PortfolioBlog.Web.Services
+@inject IBlogApi BlogApi
+@rendermode InteractiveServer
+
+<PageTitle>Posts</PageTitle>
+
+<h1>Blog Posts</h1>
+
+<div style="border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+    <h3>New Post</h3>
+    <EditForm Model="_newPost" OnValidSubmit="CreatePostAsync" FormName="create-post">
+        <div style="margin-bottom: 8px;">
+            <label>Title</label>
+            <InputText @bind-Value="_newPost.Title" style="display: block; width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+        <div style="margin-bottom: 8px;">
+            <label>Content</label>
+            <InputTextArea @bind-Value="_newPost.Content" style="display: block; width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px;" rows="3" />
+        </div>
+        <button type="submit" style="padding: 8px 16px; background: #0d6efd; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Create
+        </button>
+    </EditForm>
+</div>
+
+@if (_posts is null)
+{
+    <p>Loading...</p>
+}
+else if (_posts.Count == 0)
+{
+    <p>No posts yet.</p>
+}
+else
+{
+    @foreach (PostResponse post in _posts)
+    {
+        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+            <h4 style="margin: 0 0 4px 0;">@post.Title</h4>
+            <p style="margin: 0 0 4px 0;">@post.Content</p>
+            <small style="color: #666;">@post.CreatedAt.ToString("g")</small>
+        </div>
+    }
+}
+
+@code {
+    private List<PostResponse>? _posts;
+    private NewPostModel _newPost = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostsAsync();
+    }
+
+    private async Task LoadPostsAsync()
+    {
+        try
+        {
+            _posts = await BlogApi.GetPostsAsync();
+        }
+        catch
+        {
+            _posts = [];
+        }
+    }
+
+    private async Task CreatePostAsync()
+    {
+        try
+        {
+            PostResponse created = await BlogApi.CreatePostAsync(
+                new CreatePostRequest(_newPost.Title, _newPost.Content)
+            );
+            _newPost = new();
+            _posts?.Insert(0, created);
+        }
+        catch
+        {
+            // API might require auth — silent fail for now
+        }
+    }
+
+    private class NewPostModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
+}
